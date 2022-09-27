@@ -33,7 +33,8 @@ type ProductProps = {
 }
 
 
-export default function Pedidos( { orders }: HomeProps) {
+
+export default function Pedidos({ orders }: HomeProps) {
 
     const router = useRouter()
     const table = router.query.table
@@ -41,11 +42,11 @@ export default function Pedidos( { orders }: HomeProps) {
 
 
     const [categories, setCategories] = useState<CategoryProps[] | []>([])
-    const [categorySelect, setCategorySelect] = useState<CategoryProps | undefined>()
+    const [categorySelect, setCategorySelect] = useState('')
 
-    
 
-    const [productSelected, setProductSelected] = useState<ProductProps>()
+
+    const [productSelected, setProductSelected] = useState()
     const [products, setProducts] = useState<ProductProps[] | []>([])
 
     const [amount, setAmount] = useState('')
@@ -55,19 +56,19 @@ export default function Pedidos( { orders }: HomeProps) {
 
 
 
-    useEffect(()=> {
-        async function loadinfo(){
+    useEffect(() => {
+        async function loadinfo() {
 
             const response = await api.get('/category')
 
             setCategories(response.data)
-           
+
             setCategorySelect(response.data[0])
-            console.log(response.data)
             
-        } 
+
+        }
         loadinfo()
-        
+
     }, [])
 
 
@@ -75,19 +76,21 @@ export default function Pedidos( { orders }: HomeProps) {
 
         async function loadProducts() {
 
-            console.log(categorySelect?.id)
-            
+            // console.log(categories[categorySelect])
+            // console.log(categorySelect?.id)
+
             const response = await api.get('/category/product', {
-                params:{
-                    category_id: categorySelect?.id
+
+                params: {
+                    category_id: categories[categorySelect]?.id
                 }
             })
 
             setProducts(response.data)
-            setProductSelected(response.data[0])
+            setProductSelected(response.data[categories[categorySelect]])
 
-             
-            
+
+
         }
         loadProducts()
     }, [categorySelect])
@@ -95,8 +98,11 @@ export default function Pedidos( { orders }: HomeProps) {
 
     function handleChangeCategory(event) {
 
-      
         setCategorySelect(event.target.value)
+
+        
+
+       
 
     }
 
@@ -125,7 +131,7 @@ export default function Pedidos( { orders }: HomeProps) {
 
                         <span>Selecione uma Categoria</span>
 
-                        <select onChange={handleChangeCategory} >
+                        <select value={categorySelect} onChange={handleChangeCategory}  >
 
                             {categories.map((item, index) => {
 
@@ -143,8 +149,8 @@ export default function Pedidos( { orders }: HomeProps) {
 
                         <span>Selecione um Produto</span>
 
-                        <select value={productSelected} onChange={handleChangeProduct} >
-
+                        <select value={productSelected} onChange={handleChangeProduct}  >
+                           
                             {products.map((item, index) => {
 
 
@@ -157,7 +163,7 @@ export default function Pedidos( { orders }: HomeProps) {
 
 
                             {/* {products.length !== 0 && (
-                                   <option key={productSelected.id} >
+                                   <option key={productSelected?.id} >
                                    {productSelected?.name}
                                </option>
                             )} */}
@@ -171,7 +177,7 @@ export default function Pedidos( { orders }: HomeProps) {
 
                         </div>
 
-                        <textarea placeholder="Ex: Tirar cebola..." className={styles.obs} value={obs} onChange={(e) => setObs(e.target.value)}/>
+                        <textarea placeholder="Ex: Tirar cebola..." className={styles.obs} value={obs} onChange={(e) => setObs(e.target.value)} />
 
 
 
