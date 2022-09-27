@@ -13,9 +13,6 @@ type ItemProps = {
     id: string
     name: string
 }
-interface CategoryProps {
-    categoryList: ItemProps[]
-}
 
 
 type OrderProps = {
@@ -30,7 +27,10 @@ interface HomeProps {
     orders: OrderProps[]
 
 }
-
+export type CategoryProps = {
+    id: string
+    name: string
+}
 type ProductProps = {
     id: string,
     name: string,
@@ -38,18 +38,18 @@ type ProductProps = {
 }
 
 
-export default function Pedidos({ categoryList }: CategoryProps, { orders }: HomeProps) {
+export default function Pedidos( { orders }: HomeProps) {
 
     const router = useRouter()
     const table = router.query.table
 
 
 
-    const [categorySelect, setCategorySelect] = useState<ItemProps | undefined>()
-    const [categories, setCategories] = useState(categoryList || [])
+    const [categories, setCategories] = useState<CategoryProps[] | []>([])
+    const [categorySelect, setCategorySelect] = useState<CategoryProps | undefined>()
 
-    const [products, setProducts] = useState<ProductProps[] | []>([])
     const [productSelected, setProductSelected] = useState<ProductProps>()
+    const [products, setProducts] = useState<ProductProps[] | []>([])
 
     const [amount, setAmount] = useState('1')
     const [obs, setObs] = useState('')
@@ -60,7 +60,9 @@ export default function Pedidos({ categoryList }: CategoryProps, { orders }: Hom
 
     useEffect(()=> {
         async function loadinfo(){
+
             const response = await api.get('/category')
+
             setCategories(response.data)
             setCategorySelect(response.data[0])
 
@@ -75,7 +77,7 @@ export default function Pedidos({ categoryList }: CategoryProps, { orders }: Hom
 
         async function loadProducts() {
 
-            const api = setupAPIClient()
+            console.log(categorySelect?.id)
 
             const response = await api.get('category/product', {
               params:{
@@ -93,15 +95,15 @@ export default function Pedidos({ categoryList }: CategoryProps, { orders }: Hom
     }, [categorySelect])
 
 
-    function handleChangeCategory(event: ItemProps) {
+    function handleChangeCategory(e) {
 
-        setCategorySelect(event.target.value)
-        
+        setCategorySelect(e.target.value)
+
     }
 
 
 
-    function handleChangeProduct(event: ProductProps) {
+    function handleChangeProduct(event) {
 
         setProductSelected(event.target.value)
     }
@@ -142,25 +144,24 @@ export default function Pedidos({ categoryList }: CategoryProps, { orders }: Hom
 
                         <span>Selecione um Produto</span>
 
-                        
-                        <select value={productSelected} onChange={ handleChangeProduct }>
+                        <select  onChange={handleChangeProduct} >
 
-                            {products.length !== 0 && (
-                                   <option key={productSelected.id} value={productSelected}>
-                                   {productSelected?.name}
-                               </option>
-                            )}
-
-
-                            {/* {products.map((item, index) => {
+                            {products.map((item, index) => {
 
 
                                 return (
                                     <option key={item.id} value={index}>
-                                        {item?.name}
+                                        {item.name}
                                     </option>
                                 )
-                            })} */}
+                            })}
+
+
+                            {/* {products.length !== 0 && (
+                                   <option key={productSelected.id} >
+                                   {productSelected?.name}
+                               </option>
+                            )} */}
 
                         </select>
 
@@ -171,11 +172,11 @@ export default function Pedidos({ categoryList }: CategoryProps, { orders }: Hom
 
                         </div>
 
-                        <textarea placeholder="Ex: Tirar cebola..." className={styles.obs} />
+                        <textarea placeholder="Ex: Tirar cebola..." className={styles.obs} value={obs} onChange={(e) => setObs(e.target.value)}/>
 
 
 
-                        <button className={styles.btnNext} value={obs} onChange={(e) => setObs(e.target.value)}>
+                        <button className={styles.btnNext} >
                             AVANÇAR
                         </button>
 
@@ -192,7 +193,7 @@ export const getServerSideProps = canSSRAuth(async (ctx) => {
 
     const apiClient = setupAPIClient(ctx)
 
-    const response = await apiClient.get('/category')
+
 
     const params = await apiClient.get('/orders')
 
@@ -202,7 +203,7 @@ export const getServerSideProps = canSSRAuth(async (ctx) => {
     return {
 
         props: {
-            categoryList: response.data,
+
             orders: params.data
         }
 
