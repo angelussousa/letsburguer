@@ -3,16 +3,11 @@ import { Header } from "../../components/Header";
 import { setupAPIClient } from "../../services/api";
 import styles from './styles.module.scss'
 import { canSSRAuth } from "../../utils/canSSRAuth";
-import { useState, useEffect, FormEvent } from 'react'
+import { useState, useEffect, FormEvent, ChangeEvent } from 'react'
 import { OrderItemProps } from '../dashboard'
 import { useRouter } from 'next/router'
 import { api } from "../../services/apiClient";
 
-
-type ItemProps = {
-    id: string
-    name: string
-}
 
 
 type OrderProps = {
@@ -48,10 +43,12 @@ export default function Pedidos( { orders }: HomeProps) {
     const [categories, setCategories] = useState<CategoryProps[] | []>([])
     const [categorySelect, setCategorySelect] = useState<CategoryProps | undefined>()
 
+    
+
     const [productSelected, setProductSelected] = useState<ProductProps>()
     const [products, setProducts] = useState<ProductProps[] | []>([])
 
-    const [amount, setAmount] = useState('1')
+    const [amount, setAmount] = useState('')
     const [obs, setObs] = useState('')
 
     const [ordersProps, setOrdersProps] = useState(orders)
@@ -64,9 +61,10 @@ export default function Pedidos( { orders }: HomeProps) {
             const response = await api.get('/category')
 
             setCategories(response.data)
+           
             setCategorySelect(response.data[0])
-
             console.log(response.data)
+            
         } 
         loadinfo()
         
@@ -78,11 +76,11 @@ export default function Pedidos( { orders }: HomeProps) {
         async function loadProducts() {
 
             console.log(categorySelect?.id)
-
-            const response = await api.get('category/product', {
-              params:{
-                category_id: categorySelect?.id
-              }
+            
+            const response = await api.get('/category/product', {
+                params:{
+                    category_id: categorySelect?.id
+                }
             })
 
             setProducts(response.data)
@@ -95,9 +93,10 @@ export default function Pedidos( { orders }: HomeProps) {
     }, [categorySelect])
 
 
-    function handleChangeCategory(e) {
+    function handleChangeCategory(event) {
 
-        setCategorySelect(e.target.value)
+      
+        setCategorySelect(event.target.value)
 
     }
 
@@ -126,7 +125,7 @@ export default function Pedidos( { orders }: HomeProps) {
 
                         <span>Selecione uma Categoria</span>
 
-                        <select value={categorySelect} onChange={handleChangeCategory} >
+                        <select onChange={handleChangeCategory} >
 
                             {categories.map((item, index) => {
 
@@ -144,7 +143,7 @@ export default function Pedidos( { orders }: HomeProps) {
 
                         <span>Selecione um Produto</span>
 
-                        <select  onChange={handleChangeProduct} >
+                        <select value={productSelected} onChange={handleChangeProduct} >
 
                             {products.map((item, index) => {
 
