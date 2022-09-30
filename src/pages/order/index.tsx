@@ -6,7 +6,7 @@ import { useState, FormEvent  } from 'react'
 import { canSSRAuth } from '../../utils/canSSRAuth'
 import { setupAPIClient } from '../../services/api'
 import { toast } from 'react-toastify'
-import { stringify } from 'querystring'
+
 
 
 
@@ -41,8 +41,10 @@ export default function Order() {
             name: nomeMesa,
             table: Number(numeroMesa),
             
+            
          })
 
+         console.log(response.data)
         
          toast.success(`Mesa ${numeroMesa} aberta!`)
 
@@ -50,7 +52,8 @@ export default function Order() {
          setNumeroMesa('')
          setNomeMesa('')
          
-         Router.push(`/pedidos/${numeroMesa}` )
+         
+         Router.push(`/pedidos/${numeroMesa}`,`/pedidos/${response.data.id}` )
         }
 
 

@@ -36,9 +36,9 @@ export default function Product({ categoryList }: CategoryProps) {
 
     function handleFile(e: ChangeEvent<HTMLInputElement>) {
 
-        if (!e.target.files) {
-            return;
-        }
+        // if (!e.target.files) {
+        //     return;
+        // }
         const img = e.target.files[0];
 
         if (!img) {
@@ -64,7 +64,7 @@ export default function Product({ categoryList }: CategoryProps) {
         try {
             const data = new FormData();
 
-            if (name === '' || price === '' || description === '') {
+            if (name === '' || price === '' ) {
                 toast.warning('Preencha os campos!')
                 return;
             }

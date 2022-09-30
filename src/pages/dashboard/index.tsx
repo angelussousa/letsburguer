@@ -9,7 +9,7 @@ import { setupAPIClient } from "../../services/api"
 import Modal from 'react-modal'
 import {ModalOrder} from '../../components/ModalOrder'
 
-type OrderProps = {
+ type OrderProps = {
     id: string
     table: string | number
     status: boolean
