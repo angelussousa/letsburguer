@@ -112,7 +112,6 @@
     display: flex;
     flex-direction: row;
     
-    justify-content: space-evenly;
     
        
 }
@@ -126,16 +125,49 @@
     border: 1px solid var(--gray-100);
     height: 100%;
     width: 100%;
-    min-width: max-content;
     padding-top: 1rem;
-    padding-left: 1rem;
+    padding-left:0.5rem;
+    padding-right:0.5rem;
     color: var(--white);
     font-size: 1.2rem;
     
-    span{
-        color:var(--white);
-        font-size: 1rem;
-        text-align: center;
+  
+    
+}
+.divItem{
+    border-radius: 0.3rem;
+    border: 1px solid var(--gray-100);
+    background-color: var(--green-900);
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    height: 2rem;
+   
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+   
+    
+}
+
+.btnTrash{
+    background-color: transparent;
+    border: 0;
+    transition: 0.6s;
+   
+
+    &:hover{
+        background-color: #000;
+        border-radius: 0.3rem;
+        scale: 1.2;
     }
+}
+.item{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    
+    
+    
     
 }

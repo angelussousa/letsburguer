@@ -53,7 +53,7 @@ export default function Order() {
          setNomeMesa('')
          
          
-         Router.push(`/pedidos/${numeroMesa}`,`/pedidos/${response.data.id}` )
+         Router.push(`/pedidos/${response.data.id}` )
         }
 
 
