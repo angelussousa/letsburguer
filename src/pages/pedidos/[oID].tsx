@@ -4,10 +4,11 @@ import { setupAPIClient } from "../../services/api";
 import styles from './styles.module.scss'
 import { canSSRAuth } from "../../utils/canSSRAuth";
 import { useState, useEffect, FormEvent, ChangeEvent } from 'react'
-import { OrderItemProps } from '../dashboard'
 import { useRouter, withRouter } from 'next/router'
 import { api } from "../../services/apiClient";
-import { FiTrash2 } from 'react-icons/fi'
+import { FiTrash2, FiEdit3 } from 'react-icons/fi'
+import { toast } from "react-toastify";
+import {ModalObsPedidos} from '../../components/ModalObs/index';
 
 
 
@@ -33,18 +34,21 @@ type ProductProps = {
     price: string
 }
 
-type ItemProps = {
+export type ItemProps = {
+    
     id: string,
     name: string,
     product_id: string,
+    obs: string,
     amount: string | number
 }
 
 interface Items {
     items:{
         id: string,
-        name: string,
+        produto: string,
         product_id: string,
+        obs: string,
         amount: string | number
     }
     deleteItem: (item_id:string) => void
@@ -69,10 +73,15 @@ export default function Pedidos({ orders }: HomeProps) {
     const [productSelected, setProductSelected] = useState('')
     const [products, setProducts] = useState<ProductProps[] | []>([])
 
-    const [amount, setAmount] = useState('')
-    const [items, setItems] = useState<ItemProps[]>([])
+    const [amount, setAmount] = useState(null)
+    const [items, setItems] = useState([])
 
     const [obs, setObs] = useState('')
+
+    //MODAL
+    const [modalItem, setModalItem] = useState<ItemProps[] | []>(items)
+    const [modalVisible, setModalVisible] = useState(false)
+
 
     const [ordersProps, setOrdersProps] = useState<OrderProps[]>(orders)
 
@@ -100,8 +109,7 @@ export default function Pedidos({ orders }: HomeProps) {
 
         async function loadProducts() {
 
-            // console.log(categories[categorySelect])
-            // console.log(categorySelect?.id)
+    
 
             const response = await api.get('/category/product', {
 
@@ -130,7 +138,29 @@ export default function Pedidos({ orders }: HomeProps) {
 
     }
 
+    async function handleOpenModalView(id: string) {
+        event.preventDefault()
 
+        
+        const apiClient = setupAPIClient()
+        const response = await apiClient.get('/order/detail',{
+         params: {
+             order_id: id,
+            
+         }
+        })
+ 
+        setModalItem(response.data)
+        setModalVisible(true)
+ 
+       
+       
+         
+     }
+
+     function handleCloseModal(){
+        setModalVisible(false)
+    }
 
     function handleChangeProduct(event) {
 
@@ -163,14 +193,18 @@ export default function Pedidos({ orders }: HomeProps) {
             product_id: products[productSelected].id,
         }
 
-
-        setItems(oldArray => [...oldArray, item])
+        if(amount == 0 || amount == null){
+            toast.warn('Você precisa dizer a quantidade!')
+        }else{
+            setItems(oldArray => [...oldArray, item])
         setObs('')
-        setAmount('')
+        setAmount(null) 
+        }
+       
 
 
-        console.log(amount)
-        console.log(item)
+        // console.log(amount)
+        // console.log(item)
 
     }
 
@@ -276,9 +310,21 @@ export default function Pedidos({ orders }: HomeProps) {
                                                     <div className={styles.itemInt}>
                                                         <span style={{ color: '#FF000F', fontSize: 21, fontWeight: 'bold', backgroundColor: '#FFF', paddingInline: 10, borderRadius: 6 }}>{item.qnt}</span>
                                                         <span style={{ color: '#000' }} > {item.produto}
+                                                        
+                                                        {/* BOTÃO DE EXCLUIR */}
+
                                                          <button
                                                             onClick={()=>handleDelete(item.id)}
-                                                          className={styles.btnTrash} ><FiTrash2 size={20} color='#FF3F4B' /></button>
+                                                          className={styles.btnTrash} ><FiTrash2 size={20} color='#FF3F4B' />
+                                                          </button>
+                                                         {/* BOTÃO DE DETALHES */}
+                                                          <button>
+
+
+                                                            <FiEdit3
+                                                            onClick={()=>handleOpenModalView(item.id)}
+                                                            className={styles.btnObs} size={20} color='#FF3F4B' />
+                                                          </button>
                                                          </span>
                                                          
                                                     </div>
@@ -294,9 +340,20 @@ export default function Pedidos({ orders }: HomeProps) {
                                 <button className={styles.btnNext} >
                                     AVANÇAR
                                 </button>
+
+                                
                             </div>
                         </div>
                     </form>
+
+
+
+
+                    {modalVisible && 
+            (
+             <ModalObsPedidos isOpen={modalVisible} onRequestClose={handleCloseModal} item={items}/>
+            )}
+
                 </div>
             </main>
         </>
